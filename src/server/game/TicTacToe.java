@@ -51,8 +51,21 @@ public class TicTacToe implements Game {
 		// Make move
 		gameBoard[position] = client == player1 ? 1 : 2;
 
-		// Check if won and if won send lose and won status codes - draw
-
+		// Check if won and if won, lost or draw
+		switch (hasWon()) {
+			case 1:
+				player1.send("002|");
+				player2.send("003|");
+				break;
+			case 2:
+				player2.send("002|");
+				player1.send("003|");
+				break;
+			case 3:
+				player1.send("012|");
+				player2.send("012|");
+				break;
+		}
 
 		// Change turn
 		turn = turn == player1 ? player2 : player1;
@@ -104,5 +117,41 @@ public class TicTacToe implements Game {
 
 	private boolean isPlayersTurn(Client client) {
 		return client == turn;
+	}
+
+	private int hasWon() {
+
+		// Player 1 won
+		if (gameBoard[0] == 1 && gameBoard[1] == 1 && gameBoard[2] == 1) return 1;
+		if (gameBoard[3] == 1 && gameBoard[4] == 1 && gameBoard[5] == 1) return 1;
+		if (gameBoard[6] == 1 && gameBoard[7] == 1 && gameBoard[8] == 1) return 1;
+		if (gameBoard[0] == 1 && gameBoard[3] == 1 && gameBoard[6] == 1) return 1;
+		if (gameBoard[1] == 1 && gameBoard[4] == 1 && gameBoard[7] == 1) return 1;
+		if (gameBoard[2] == 1 && gameBoard[5] == 1 && gameBoard[8] == 1) return 1;
+		if (gameBoard[0] == 1 && gameBoard[4] == 1 && gameBoard[8] == 1) return 1;
+		if (gameBoard[2] == 1 && gameBoard[4] == 1 && gameBoard[6] == 1) return 1;
+
+		// player 2 won
+		if (gameBoard[0] == 2 && gameBoard[1] == 2 && gameBoard[2] == 2) return 2;
+		if (gameBoard[3] == 2 && gameBoard[4] == 2 && gameBoard[5] == 2) return 2;
+		if (gameBoard[6] == 2 && gameBoard[7] == 2 && gameBoard[8] == 2) return 2;
+		if (gameBoard[0] == 2 && gameBoard[3] == 2 && gameBoard[6] == 2) return 2;
+		if (gameBoard[1] == 2 && gameBoard[4] == 2 && gameBoard[7] == 2) return 2;
+		if (gameBoard[2] == 2 && gameBoard[5] == 2 && gameBoard[8] == 2) return 2;
+		if (gameBoard[0] == 2 && gameBoard[4] == 2 && gameBoard[8] == 2) return 2;
+		if (gameBoard[2] == 2 && gameBoard[4] == 2 && gameBoard[6] == 2) return 2;
+
+		int bricks = 0;
+		int length = gameBoard.length;
+
+		for(int i = 0; i < length; i++) {
+			if(gameBoard[i] == 1 || gameBoard[i] == 2) bricks++;
+		}
+
+		// Game is draw
+		if(bricks == length) return 3;
+
+		// Game is still going
+		return 0;
 	}
 }

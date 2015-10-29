@@ -55,5 +55,35 @@ public class TicTacToeTest {
 		verify(client2, times(2)).send("011|id2,0=1.1=0.2=0.3=0.4=0.5=0.6=0.7=0.8=0");
 	}
 
+	@Test
+	public void testCanWin() throws Exception {
 
+		game.move("0", client1);
+		game.move("4", client2);
+		game.move("2", client1);
+		game.move("7", client2);
+		game.move("1", client1);
+
+		verify(client1).send("002|");
+		verify(client2).send("003|");
+
+	}
+
+	@Test
+	public void testGameCanBeDraw() throws Exception {
+
+		game.move("1", client1);
+		game.move("0", client2);
+		game.move("3", client1);
+		game.move("2", client2);
+		game.move("5", client1);
+		game.move("4", client2);
+		game.move("6", client1);
+		game.move("7", client2);
+		game.move("8", client1);
+
+		verify(client1).send("012|");
+		verify(client2).send("012|");
+
+	}
 }
