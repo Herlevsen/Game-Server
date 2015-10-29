@@ -69,6 +69,11 @@ public class Server implements Runnable {
 				String username = input[1];
 				String id = idGenerator.generate();
 
+				if(nameTaken(username)){
+					outputStream.writeObject("007|");
+					continue;
+				}
+
 				Client client = new Client(username, id, inputStream, outputStream, this);
 				connectedClients.add(client);
 
@@ -85,6 +90,16 @@ public class Server implements Runnable {
 
 		}
 
+	}
+
+	private boolean nameTaken(String username)
+	{
+		for(Client c : connectedClients) {
+			if(c.getNickname().equals(username)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
