@@ -106,6 +106,11 @@ public class Client extends Thread {
 						server.sendTo(invitationSenderId, input);
 
 						break;
+					case "010": // Decline game invitation
+
+						server.sendTo(body ,"010|" + body);
+
+						break;
 
 				}
 

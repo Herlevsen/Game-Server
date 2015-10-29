@@ -178,7 +178,64 @@ public class ServerTest {
 
 		input = (String) i1.readObject();
 
-		assertEquals("009|" + invitationSenderId + "," + invitationReceiverId + "," + gameType, input);
+		assertEquals("009|id1,id2,tictactoe", input);
+
+		server.stop();
+
+	}
+
+	@Test
+	public void testCanDeclineInvitation() throws Exception {
+
+		Mockito.when(idGenerator.generate()).
+				thenReturn("id1").
+				thenReturn("id2");
+
+		String input = "";
+
+		Socket client1 = new Socket("localhost", 9898);
+		Socket client2 = new Socket("localhost", 9898);
+
+		ObjectOutputStream o1 = new ObjectOutputStream(client1.getOutputStream());
+		ObjectInputStream i1 = new ObjectInputStream(client1.getInputStream());
+
+		// Client 1 connection
+		o1.writeObject("000|Hans");
+		input = (String) i1.readObject();
+		String id1 = input.split("\\|")[1].split(",")[0];
+
+		ObjectOutputStream o2 = new ObjectOutputStream(client2.getOutputStream());
+		ObjectInputStream i2 = new ObjectInputStream(client2.getInputStream());
+
+		o2.writeObject("000|John");
+
+		// Connection established
+		input = (String) i2.readObject();
+
+		// Read player list - One for own connection and one for other connection
+		i1.readObject();
+		i1.readObject();
+
+		// Find player 2 id
+		String id2 = input.split("\\|")[1].split(",")[0];
+
+		// Player list
+		input = (String) i2.readObject();
+
+		// Send invite
+		o1.writeObject("005|" + id2 + "," + "tictactoe" + "," + id1);
+
+		input = (String) i2.readObject();
+		String[] splitted = input.split("\\|");
+		String invitationReceiverId = splitted[1].split(",")[0];
+		String invitationSenderId = splitted[1].split(",")[2];
+		String gameType = splitted[1].split(",")[1];
+
+		o2.writeObject("010|" + invitationSenderId);
+
+		input = (String) i1.readObject();
+
+		assertEquals("010|id1", input);
 
 		server.stop();
 
