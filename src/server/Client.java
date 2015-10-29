@@ -67,7 +67,7 @@ public class Client extends Thread {
 						if(!inGame()) break;
 
 						// Pass the data on to the game, and let the game handle the logic and sending of game state
-						game.move(body);
+						game.move(body, this);
 
 						break;
 					case "005": // Game invitation
