@@ -81,6 +81,38 @@ public class ServerTest {
 	}
 
 	@Test
+	public void testUsernameAlreadyInUse() throws Exception {
+		Mockito.when(idGenerator.generate()).
+				thenReturn("id1").
+				thenReturn("id2");
+
+		String input = "";
+
+		Socket client1 = new Socket("localhost", 9898);
+		Socket client2 = new Socket("localhost", 9898);
+
+		ObjectOutputStream oSClient1 = new ObjectOutputStream(client1.getOutputStream());
+		ObjectInputStream iSClient1 = new ObjectInputStream(client1.getInputStream());
+
+
+		ObjectOutputStream oSClient2 = new ObjectOutputStream(client2.getOutputStream());
+
+		oSClient1.writeObject("000|Hans");
+		// Connection established
+		input = (String) iSClient1.readObject();
+		String id1 = input.split("\\|")[1].split(",")[0];
+
+
+		oSClient2.writeObject("000|Hans");
+
+		ObjectInputStream iSClient2 = new ObjectInputStream(client2.getInputStream());
+		// Connection established
+		input = (String) iSClient2.readObject();
+
+		assertEquals("007|", input);
+	}
+
+	@Test
 	public void testCanInvitePersonToGame() throws Exception {
 
 		Mockito.when(idGenerator.generate()).
