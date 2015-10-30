@@ -14,4 +14,8 @@ public interface Game {
 	 */
 	public void move(String data, Client client);
 
+    /**
+     * Start the game and send the initial state
+     */
+    public void startGame();
 }

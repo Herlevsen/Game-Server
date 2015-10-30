@@ -219,6 +219,9 @@ public class Server implements Runnable {
 		// Notify sender that the invitation was accepted
 		sendTo(invitationSenderId, input);
 
+        // Start game
+        game.startGame();
+
 		// Remove from connected clients
 		connectedClients.remove(player1);
 		connectedClients.remove(player2);

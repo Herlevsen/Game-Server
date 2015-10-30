@@ -25,13 +25,13 @@ public class TicTacToe implements Game {
 		turn = player1;
 
 		// Send start state to clients
-		sendGameState();
 	}
 
 	@Override
 	public void move(String data, Client client) {
 		int position = -1;
-		try {
+
+        try {
 			position = Integer.parseInt(data);
 		} catch (NumberFormatException e) {
 			// Send original state
@@ -70,13 +70,16 @@ public class TicTacToe implements Game {
 		// Change turn
 		turn = turn == player1 ? player2 : player1;
 
-		// Send state response to both players
-		sendGameState();
-
+        sendGameState();
 
 	}
 
-	private void sendGameState() {
+    @Override
+    public void startGame() {
+        sendGameState();
+    }
+
+    private void sendGameState() {
 
 		StringBuilder stringBuilder = new StringBuilder(100);
 
