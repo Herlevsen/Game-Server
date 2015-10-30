@@ -72,7 +72,7 @@ public class Client extends Thread {
 
 						break;
 					case "005": // Game invitation
-						splitted = body.split(",");
+                        splitted = body.split(",");
 						String receiverId = splitted[0];
 						String game = splitted[1];
 
@@ -98,13 +98,8 @@ public class Client extends Thread {
 						String invitationReceiverId = splitted[1];
 						String gameType = splitted[2];
 
-						// Try to make the game
-						boolean gameCreated = server.makeGame(invitationSenderId, invitationReceiverId, gameType, input);
-
-						if(!gameCreated) break;
-
-						// Notify sender that the invitation was accepted
-						server.sendTo(invitationSenderId, input);
+                        // Try to make the game
+						server.makeGame(invitationSenderId, invitationReceiverId, gameType, input);
 
 						// Send the list of clients
 						server.sendClientList();
