@@ -58,6 +58,7 @@ public class Client extends Thread {
 				switch(statusCode) {
 
 					case "001":
+						server.sendToCurrent(body, "001|" + body);
 						break;
 					case "002":
 						break;
@@ -104,6 +105,9 @@ public class Client extends Thread {
 
 						// Notify sender that the invitation was accepted
 						server.sendTo(invitationSenderId, input);
+
+						// Send the list of clients
+						server.sendClientList();
 
 						break;
 					case "010": // Decline game invitation

@@ -93,7 +93,7 @@ public class Server implements Runnable {
 	}
 
 	private boolean nameTaken(String username)
-	{
+    {
 		for(Client c : connectedClients) {
 			if(c.getNickname().equals(username)) {
 				return true;
@@ -105,21 +105,21 @@ public class Server implements Runnable {
 	/**
 	 * Send list of clients, to all clients that is connected but not currently playing
 	 */
-	private void sendClientList() {
+	public void sendClientList() {
 
 		StringBuilder stringBuilder = new StringBuilder(800);
 		stringBuilder.append("006|");
 		Iterator<Client> iterator = connectedClients.iterator();
 
-		while(iterator.hasNext()) {
+		while (iterator.hasNext()) {
 
 			Client client = iterator.next();
 
 			stringBuilder.append(client.getClientId() + "." + client.getNickname());
-			if(iterator.hasNext()) stringBuilder.append(",");
+			if (iterator.hasNext()) stringBuilder.append(",");
 		}
 
-		for(Client client : connectedClients) {
+		for (Client client : connectedClients) {
 
 			client.send(stringBuilder.toString());
 
@@ -129,6 +129,7 @@ public class Server implements Runnable {
 
 	/**
 	 * Remove client from list. Call this when client disconnects
+	 *
 	 * @param client The client object to remove
 	 */
 	public void removeClient(Client client) {
@@ -141,21 +142,74 @@ public class Server implements Runnable {
 	/**
 	 * Send data to a specific user
 	 *
-	 * @param id Id of the user to send the data to
+	 * @param id   Id of the user to send the data to
 	 * @param data Data to send to the user
 	 */
 	public void sendTo(String id, String data) {
 
 		// Find the client
-		for(Client client : connectedClients) {
+		for (Client client : connectedClients) {
 
-			if(client.getClientId().equals(id)) {
+			if (client.getClientId().equals(id)) {
 				client.send(data);
 				break;
 			}
 
 		}
 
+	}
+
+	/**
+	 * Send data to a specific user
+	 *
+	 * @param id   Id of the user to send the data to
+	 * @param data Data to send to the user
+	 */
+	public void sendToCurrent(String id, String data) {
+
+		Client client = null;
+		TicTacToe currentgame = null;
+
+		for (Game game : currentGames) {
+			if (game instanceof TicTacToe) {
+				TicTacToe specificGame = (TicTacToe) game;
+				if (specificGame.getPlayer1().getClientId().equals(id)) {
+
+					currentgame = specificGame;
+
+					client = specificGame.getPlayer2();
+					connectedClients.add(client);
+					sendClientList();
+
+					client = specificGame.getPlayer1();
+
+
+
+					break;
+				} else if (specificGame.getPlayer2().getClientId().equals(id)) {
+
+					currentgame = specificGame;
+
+					client = specificGame.getPlayer1();
+					connectedClients.add(client);
+					sendClientList();
+
+					client = specificGame.getPlayer2();
+					break;
+
+
+				}
+
+			}
+
+		}
+
+		client.send(data);
+		connectedClients.add(client);
+
+		currentGames.remove(currentgame);
+
+		sendClientList();
 	}
 
 	public void stop() {
@@ -170,10 +224,14 @@ public class Server implements Runnable {
 
 	}
 
+	public List<Game> getCurrentGames() {
+		return currentGames;
+	}
+
 	/**
-	 * @param invitationSenderId Client who send the invitation
+	 * @param invitationSenderId   Client who send the invitation
 	 * @param invitationReceiverId Client who received the invitation
-	 * @param gameType Game to be played
+	 * @param gameType             Game to be played
 	 * @param input
 	 * @return Return true if game was created successfully
 	 */
@@ -184,20 +242,22 @@ public class Server implements Runnable {
 		Game game = null;
 
 		// If it's TicTacToe:
-		if(gameType.equals("tictactoe")) {
+		if (gameType.equals("tictactoe")) {
 
 			// Find players by their id
-			for(Client client : connectedClients) {
+			for (Client client : connectedClients) {
 
-				if(player1 == null) {
+				if (player1 == null) {
 
-					if(!client.getClientId().equals(invitationReceiverId) && !client.getClientId().equals(invitationSenderId)) continue;
+					if (!client.getClientId().equals(invitationReceiverId) && !client.getClientId().equals(invitationSenderId))
+						continue;
 
 					player1 = client;
 
 				} else {
 
-					if(!client.getClientId().equals(invitationReceiverId) && !client.getClientId().equals(invitationSenderId)) continue;
+					if (!client.getClientId().equals(invitationReceiverId) && !client.getClientId().equals(invitationSenderId))
+						continue;
 
 					player2 = client;
 
@@ -206,7 +266,7 @@ public class Server implements Runnable {
 
 			}
 
-			if(player1 == null || player2 == null) return false;
+			if (player1 == null || player2 == null) return false;
 
 			game = new TicTacToe(player1, player2);
 		}

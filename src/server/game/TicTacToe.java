@@ -28,6 +28,14 @@ public class TicTacToe implements Game {
 		sendGameState();
 	}
 
+	public Client getPlayer1() {
+		return player1;
+	}
+
+	public Client getPlayer2() {
+		return player2;
+	}
+
 	@Override
 	public void move(String data, Client client) {
 		int position = -1;
