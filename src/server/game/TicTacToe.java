@@ -23,8 +23,6 @@ public class TicTacToe implements Game {
 		this.player1 = player1;
 		this.player2 = player2;
 		turn = player1;
-
-		// Send start state to clients
 	}
 
 	@Override
@@ -70,8 +68,8 @@ public class TicTacToe implements Game {
 		// Change turn
 		turn = turn == player1 ? player2 : player1;
 
+        // Send game state
         sendGameState();
-
 	}
 
     @Override

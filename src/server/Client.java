@@ -98,11 +98,7 @@ public class Client extends Thread {
 						String gameType = splitted[2];
 
                         // Try to make the game
-						boolean gameCreated = server.makeGame(invitationSenderId, invitationReceiverId, gameType, input);
-
-						if(!gameCreated) break;
-
-						// Notify sender that the invitation was accepted
+						server.makeGame(invitationSenderId, invitationReceiverId, gameType, input);
 
 						break;
 					case "010": // Decline game invitation

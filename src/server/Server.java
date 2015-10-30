@@ -177,7 +177,7 @@ public class Server implements Runnable {
 	 * @param input
 	 * @return Return true if game was created successfully
 	 */
-	public boolean makeGame(String invitationSenderId, String invitationReceiverId, String gameType, String input) {
+	public void makeGame(String invitationSenderId, String invitationReceiverId, String gameType, String input) {
 
 		Client player1 = null;
 		Client player2 = null;
@@ -206,7 +206,7 @@ public class Server implements Runnable {
 
 			}
 
-			if(player1 == null || player2 == null) return false;
+			if(player1 == null || player2 == null) return;
 
 			game = new TicTacToe(player1, player2);
 		}
@@ -228,7 +228,5 @@ public class Server implements Runnable {
 
 		// Add game
 		currentGames.add(game);
-
-		return true;
 	}
 }
