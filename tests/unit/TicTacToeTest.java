@@ -38,8 +38,8 @@ public class TicTacToeTest {
 	}
 
 	@Test
-	public void testSendsGameStartAtConstruction() throws Exception {
-
+	public void testSendsGameStateAtConstruction() throws Exception {
+		game.startGame();
 		verify(client1).send("011|id1,0=0.1=0.2=0.3=0.4=0.5=0.6=0.7=0.8=0");
 		verify(client2).send("011|id1,0=0.1=0.2=0.3=0.4=0.5=0.6=0.7=0.8=0");
 
