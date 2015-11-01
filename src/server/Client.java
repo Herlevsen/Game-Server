@@ -1,12 +1,11 @@
 package server;
 
 import server.game.Game;
-import server.game.TicTacToe;
+import server.statuscode.*;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 
 public class Client extends Thread {
 
@@ -19,6 +18,7 @@ public class Client extends Thread {
 	private ObjectOutputStream outputStream;
 
 	private Server server;
+	private StatusCodeHandlerFactory statusCodeHandlerFactory;
 
 	private String[] gameTypes = {"tictactoe"};
 
@@ -29,13 +29,15 @@ public class Client extends Thread {
 	 * @param id Unique id
 	 * @param inputStream Input stream for incoming communication
 	 * @param outputStream Output stream for outgoing communication
+	 * @param statusCodeHandlerFactory Factory to construct the StatusCodeHandlers
 	 */
-	public Client(String name, String id, ObjectInputStream inputStream, ObjectOutputStream outputStream, Server server) {
+	public Client(String name, String id, ObjectInputStream inputStream, ObjectOutputStream outputStream, Server server, StatusCodeHandlerFactory statusCodeHandlerFactory) {
 		this.name = name;
 		this.id = id;
 		this.inputStream = inputStream;
 		this.outputStream = outputStream;
 		this.server = server;
+		this.statusCodeHandlerFactory = statusCodeHandlerFactory;
 	}
 
 	/**
@@ -55,63 +57,8 @@ public class Client extends Thread {
 				String body = inputArr[1];
 				String[] splitted;
 
-				switch(statusCode) {
-
-					case "001":
-						server.sendToCurrent(body, "001|" + body);
-						break;
-					case "002":
-						break;
-					case "003":
-						break;
-					case "004":
-						if(!inGame()) break;
-
-						// Pass the data on to the game, and let the game handle the logic and sending of game state
-						game.move(body, this);
-
-						break;
-					case "005": // Game invitation
-                        splitted = body.split(",");
-						String receiverId = splitted[0];
-						String game = splitted[1];
-
-						// Check if game is valid and break if not
-						boolean gameIsValid = false;
-
-						for(String gameType : gameTypes) {
-							if(gameType.equals(game)) {
-								gameIsValid = true;
-								break;
-							}
-						}
-
-						if(!gameIsValid) break;
-
-						// Send invitation
-						server.sendTo(receiverId, input);
-
-						break;
-					case "009": // Accept game invitation
-						splitted = body.split(",");
-						String invitationSenderId = splitted[0];
-						String invitationReceiverId = splitted[1];
-						String gameType = splitted[2];
-
-                        // Try to make the game
-						server.makeGame(invitationSenderId, invitationReceiverId, gameType, input);
-
-						// Send the list of clients
-						server.sendClientList();
-
-						break;
-					case "010": // Decline game invitation
-
-						server.sendTo(body ,"010|" + body);
-
-						break;
-
-				}
+				StatusCodeHandler statusCodeHandler = statusCodeHandlerFactory.build(statusCode, this);
+				statusCodeHandler.handle(body);
 
 
 			} catch (IOException e) {
@@ -119,13 +66,15 @@ public class Client extends Thread {
 				return;
 			} catch (ClassNotFoundException e) {
 				e.printStackTrace();
+			} catch (StatusCodeHandlerNotFoundException e) {
+				System.out.println(e.getMessage());
 			}
 
 		}
 
 	}
 
-	private boolean inGame() {
+	public boolean inGame() {
 		return game != null;
 	}
 
@@ -146,6 +95,10 @@ public class Client extends Thread {
 			e.printStackTrace();
 		}
 
+	}
+
+	public void move(String body) {
+		game.move(body, this);
 	}
 
 	public void setGame(Game game) {

@@ -2,6 +2,7 @@ package server;
 
 import server.game.Game;
 import server.game.TicTacToe;
+import server.statuscode.StatusCodeHandlerFactory;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -74,7 +75,7 @@ public class Server implements Runnable {
 					continue;
 				}
 
-				Client client = new Client(username, id, inputStream, outputStream, this);
+				Client client = new Client(username, id, inputStream, outputStream, this, new StatusCodeHandlerFactory(this));
 				connectedClients.add(client);
 
 				client.start();
